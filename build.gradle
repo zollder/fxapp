@@ -8,16 +8,15 @@ compileJava.options.encoding = 'UTF-8'
 mainClassName = 'org.app.MainApp'
 
 jar {
-    manifest {
-        attributes 'Implementation-Title': 'Gradle Quickstart',
+	manifest {
+        attributes 'Implementation-Title': 'fxapp',
                    'Implementation-Version': version,
 				   'Main-Class': mainClassName
-    }
+	}
+	from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }
 
-repositories {
-    mavenCentral()
-}
+repositories { mavenCentral() }
 
 dependencies {
     compile 'commons-collections:commons-collections:3.2'
@@ -25,9 +24,7 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.+'
 }
 
-test {
-    systemProperties 'property': 'value'
-}
+test { systemProperties 'property': 'value' }
 
 uploadArchives {
     repositories {
@@ -36,3 +33,5 @@ uploadArchives {
        }
     }
 }
+
+task wrapper(type: Wrapper) { gradleVersion = '2.11' }
