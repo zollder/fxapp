@@ -57,7 +57,7 @@
                   </GridPane>
                   <HBox alignment="BASELINE_RIGHT" layoutY="198.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="27.0" prefWidth="295.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
                      <children>
-                        <Button alignment="CENTER" contentDisplay="CENTER" defaultButton="true" lineSpacing="5.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="50.0" text="New..." textAlignment="CENTER">
+                        <Button alignment="CENTER" contentDisplay="CENTER" defaultButton="true" lineSpacing="5.0" mnemonicParsing="false" onAction="#handleCreatePerson" prefHeight="21.0" prefWidth="50.0" text="New..." textAlignment="CENTER">
                            <font>
                               <Font size="12.0" />
                            </font>
@@ -71,7 +71,7 @@
                               <Insets bottom="5.0" right="5.0" top="5.0" />
                            </HBox.margin>
                         </Button>
-                        <Button alignment="CENTER" lineSpacing="5.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="49.0" text="Edit ..." textAlignment="CENTER">
+                        <Button alignment="CENTER" lineSpacing="5.0" mnemonicParsing="false" onAction="#handleEditPerson" prefHeight="21.0" prefWidth="49.0" text="Edit ..." textAlignment="CENTER">
                            <font>
                               <Font size="12.0" />
                            </font>

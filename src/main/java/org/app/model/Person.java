@@ -18,7 +18,10 @@ public class Person
 	private StringProperty city;
 	private ObjectProperty<LocalDate> birthday;
 
-	public Person() {}
+	public Person()
+	{
+		this(null,null);
+	}
 
 	public Person(String fname, String lname)
 	{

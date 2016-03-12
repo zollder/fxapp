@@ -62,6 +62,50 @@ public class PersonOverviewController
 	}
 
 	/**
+	 * Handles new operation.
+	 * Is called when a user clicks "new..." button.
+	 * Opens a dialog to enter new person details.
+	 * Returns created {@link Person} object.
+	 */
+	@FXML
+	private Optional<Person> handleCreatePerson()
+	{
+		Person newPerson = new Person();
+		if (mainApp.showPersonEditDialog(newPerson))
+			mainApp.getData().add(newPerson);
+
+		return Optional.ofNullable(newPerson);
+	}
+
+	/**
+	 * Handles edit operation.
+	 * Is called when a user clicks "edit..." button.
+	 * Opens a dialog to modify existing person details.
+	 * Returns modified {@link Person} object.
+	 */
+	@FXML
+	private Optional<Person> handleEditPerson()
+	{
+		Person selectedPerson = personTable.getSelectionModel().getSelectedItem();
+		if (selectedPerson != null)
+		{
+			if (mainApp.showPersonEditDialog(selectedPerson))
+				showPersonDetails(selectedPerson);
+			else
+			{
+				Alert alert = new Alert(AlertType.WARNING);
+				alert.initOwner(mainApp.getPrimaryStage());
+				alert.setTitle("Edit error");
+				alert.setHeaderText("No Person selected");
+				alert.setContentText("Please select a person to edit.");
+				alert.showAndWait();
+			}
+		}
+
+		return Optional.ofNullable(selectedPerson);
+	}
+
+	/**
 	 * Handles delete operation.
 	 * Returns deleted {@link Person} object.
 	 */
