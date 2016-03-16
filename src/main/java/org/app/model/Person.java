@@ -9,8 +9,13 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.neo4j.ogm.annotation.GraphId;
+import org.neo4j.ogm.annotation.NodeEntity;
+
+@NodeEntity
 public class Person
 {
+	@GraphId private Long id;
 	private StringProperty firstName;
 	private StringProperty lastName;
 	private StringProperty street;
@@ -18,6 +23,7 @@ public class Person
 	private StringProperty city;
 	private ObjectProperty<LocalDate> birthday;
 
+	//--------------------------------------------------------------------------------------
 	public Person()
 	{
 		this(null,null);
@@ -33,6 +39,13 @@ public class Person
 		this.birthday = new SimpleObjectProperty<LocalDate>(LocalDate.of(1999, 2, 21));
 	}
 
+	//--------------------------------------------------------------------------------------
+	public Long getId()
+	{
+		return this.id;
+	}
+
+	//--------------------------------------------------------------------------------------
 	public StringProperty firstNameProperty()
 	{
 		return firstName;

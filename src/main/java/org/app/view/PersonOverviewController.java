@@ -1,14 +1,24 @@
 package org.app.view;
 
+import java.io.IOException;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import org.app.MainApp;
 import org.app.model.Person;
@@ -25,6 +35,8 @@ public class PersonOverviewController
 	@FXML private Label postalCodeLabel;
 	@FXML private Label birthdayLabel;
 
+	private ObservableList<Person> data = FXCollections.observableArrayList();
+
 	/* A hook to main */
 	private MainApp mainApp;
 
@@ -40,7 +52,7 @@ public class PersonOverviewController
 		this.mainApp = mainApp;
 
 		// populate table with data
-		personTable.setItems(mainApp.getData());
+		personTable.setItems(getData());
 	}
 
 	/**
@@ -50,6 +62,8 @@ public class PersonOverviewController
 	@FXML
 	private void initialize()
 	{
+		this.data.addAll(generateData());
+
 		// initialize person's table
 		firstNameColumn.setCellValueFactory(cell -> cell.getValue().firstNameProperty());
 		lastNameColumn.setCellValueFactory(cell -> cell.getValue().lastNameProperty());
@@ -71,8 +85,8 @@ public class PersonOverviewController
 	private Optional<Person> handleCreatePerson()
 	{
 		Person newPerson = new Person();
-		if (mainApp.showPersonEditDialog(newPerson))
-			mainApp.getData().add(newPerson);
+		if (showPersonEditDialog(newPerson, mainApp.getPrimaryStage()))
+			getData().add(newPerson);
 
 		return Optional.ofNullable(newPerson);
 	}
@@ -89,7 +103,7 @@ public class PersonOverviewController
 		Person selectedPerson = personTable.getSelectionModel().getSelectedItem();
 		if (selectedPerson != null)
 		{
-			if (mainApp.showPersonEditDialog(selectedPerson))
+			if (showPersonEditDialog(selectedPerson, mainApp.getPrimaryStage()))
 				showPersonDetails(selectedPerson);
 			else
 			{
@@ -150,5 +164,59 @@ public class PersonOverviewController
 			postalCodeLabel.setText("");
 			birthdayLabel.setText("");
 		}
+	}
+
+	/**
+	 * Opens a dialog to edit details of the specified person.
+	 * @param peson
+	 */
+	public boolean showPersonEditDialog(Person person, Stage primaryStage)
+	{
+		try
+		{
+			// load FXML and create new dialog stage
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(MainApp.class.getResource("view/PersonEditDialog.fxml"));
+			AnchorPane editDialog = (AnchorPane) loader.load();
+
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Edit Person");
+			dialogStage.initModality(Modality.WINDOW_MODAL);
+			dialogStage.initOwner(primaryStage);
+			Scene dialogScene = new Scene(editDialog);
+			dialogStage.setScene(dialogScene);
+
+			// get dialog controller and set Person object
+			PersonEditDialogController controller = loader.getController();
+			controller.setDialogStage(dialogStage);
+			controller.setPerson(person);
+
+			dialogStage.showAndWait();
+			return controller.isOkClicked();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public ObservableList<Person> getData()
+	{
+		return data;
+	}
+
+	public List<Person> generateData()
+	{
+		return Arrays.asList(
+				new Person("Hans", "Muster"),
+				new Person("Ruth", "Mueller"),
+				new Person("Heinz", "Kurz"),
+				new Person("Cornelia", "Meier"),
+				new Person("Werner", "Meyer"),
+				new Person("Lydia", "Kunz"),
+				new Person("Anna", "Best"),
+				new Person("Stefan", "Meier"),
+				new Person("Martin", "Mueller"));
 	}
 }
