@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableTransactionManagement
-@EnableNeo4jRepositories("org.app.repository")
+@EnableNeo4jRepositories
 @PropertySource("classpath:/org/app/properties/database.properties")
 public class SpringDatabaseConfig extends Neo4jConfiguration
 {

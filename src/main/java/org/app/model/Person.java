@@ -9,13 +9,9 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.neo4j.ogm.annotation.GraphId;
-import org.neo4j.ogm.annotation.NodeEntity;
-
-@NodeEntity
 public class Person
 {
-	@GraphId private Long id;
+	private Long id;
 	private StringProperty firstName;
 	private StringProperty lastName;
 	private StringProperty street;

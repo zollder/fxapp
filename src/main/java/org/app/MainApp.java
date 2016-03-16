@@ -1,5 +1,6 @@
 package org.app;
 
+import java.io.File;
 import java.io.IOException;
 
 import javafx.application.Application;
@@ -9,16 +10,19 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
-import org.app.config.SpringApplicationConfig;
 import org.app.view.PersonOverviewController;
+import org.neo4j.io.fs.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 
+@SpringBootApplication
 public class MainApp extends Application
 {
 	private static String[] args;
-	private AnnotationConfigApplicationContext applicationContext;
+	private ApplicationContext context;
 
 	private Stage primaryStage;
 	private BorderPane rootLayout;
@@ -26,9 +30,11 @@ public class MainApp extends Application
 	protected static final Logger logger = LoggerFactory.getLogger(MainApp.class);
 
 	@Override
-	public void start(Stage primaryStage)
+	public void start(Stage primaryStage) throws IOException
 	{
-		applicationContext = new AnnotationConfigApplicationContext(SpringApplicationConfig.class);
+		FileUtils.deleteRecursively(new File("accessingdataneo4j.db"));
+
+		context = SpringApplication.run(MainApp.class, args);
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("AddressApp");
 
@@ -39,9 +45,6 @@ public class MainApp extends Application
 	@Override
 	public void stop() throws Exception
 	{
-        if (applicationContext != null)
-        	applicationContext.close();
-
         try { super.stop(); }
         catch (Exception ex)
         { logger.error("Failed to close context. Message: " + ex.getLocalizedMessage()); }
