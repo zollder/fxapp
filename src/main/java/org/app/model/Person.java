@@ -9,9 +9,13 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.neo4j.ogm.annotation.GraphId;
+import org.neo4j.ogm.annotation.NodeEntity;
+
+@NodeEntity
 public class Person
 {
-	private Long id;
+	@GraphId private Long id;
 	private StringProperty firstName;
 	private StringProperty lastName;
 	private StringProperty street;
@@ -20,10 +24,7 @@ public class Person
 	private ObjectProperty<LocalDate> birthday;
 
 	//--------------------------------------------------------------------------------------
-	public Person()
-	{
-		this(null,null);
-	}
+	public Person() { this(null,null); }
 
 	public Person(String fname, String lname)
 	{

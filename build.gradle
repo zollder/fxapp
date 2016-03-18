@@ -37,15 +37,14 @@ repositories {
 /* Versions */
 /*-------------------------------------------------------------------------------------------*/
 ext {
-		appacheCommonsVersion = '3.0'
-		springDataVersion = '4.0.0.RELEASE'
+	appacheCommonsVersion = '3.0'
+	springDataVersion = '4.0.0.RELEASE'
 }
 
 /*-------------------------------------------------------------------------------------------*/
 /* Dependencies */
 /*-------------------------------------------------------------------------------------------*/
-dependencies {
-	   
+dependencies {  
 	compile("org.apache.commons:commons-lang3:$appacheCommonsVersion")
     compile("org.springframework.boot:spring-boot-starter")
     compile("org.springframework.data:spring-data-neo4j:$springDataVersion")

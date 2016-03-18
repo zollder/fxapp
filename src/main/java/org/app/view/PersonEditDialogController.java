@@ -12,11 +12,15 @@ import javafx.stage.Stage;
 
 import org.apache.commons.lang3.StringUtils;
 import org.app.model.Person;
+import org.app.service.PersonService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Implements a dialog to edit Person details.
  * @author zollder
  */
+@Component
 public class PersonEditDialogController
 {
 	@FXML private TextField firstNameField;
@@ -25,6 +29,9 @@ public class PersonEditDialogController
 	@FXML private TextField cityField;
 	@FXML private TextField postalCodeField;
 	@FXML private TextField birthDayField;
+
+	@Autowired
+	private PersonService personService;
 
 	private Stage dialogStage;
 	private Person person;
@@ -53,6 +60,7 @@ public class PersonEditDialogController
 			person.setCity(cityField.getText());
 			person.setBirthday(LocalDate.parse(birthDayField.getText(), DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 			okClicked = true;
+			person = personService.saveOrUpdate(person);
 			dialogStage.close();
 		}
 	}

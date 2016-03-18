@@ -1,6 +1,5 @@
 package org.app;
 
-import java.io.File;
 import java.io.IOException;
 
 import javafx.application.Application;
@@ -11,7 +10,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import org.app.view.PersonOverviewController;
-import org.neo4j.io.fs.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -32,8 +30,6 @@ public class MainApp extends Application
 	@Override
 	public void start(Stage primaryStage) throws IOException
 	{
-		FileUtils.deleteRecursively(new File("accessingdataneo4j.db"));
-
 		context = SpringApplication.run(MainApp.class, args);
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("AddressApp");

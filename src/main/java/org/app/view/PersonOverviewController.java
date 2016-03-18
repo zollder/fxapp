@@ -22,7 +22,11 @@ import javafx.stage.Stage;
 
 import org.app.MainApp;
 import org.app.model.Person;
+import org.app.service.PersonService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PersonOverviewController
 {
 	@FXML private TableView<Person> personTable;
@@ -34,6 +38,9 @@ public class PersonOverviewController
 	@FXML private Label cityLabel;
 	@FXML private Label postalCodeLabel;
 	@FXML private Label birthdayLabel;
+
+	@Autowired
+	private PersonService personService;
 
 	private ObservableList<Person> data = FXCollections.observableArrayList();
 
@@ -62,7 +69,8 @@ public class PersonOverviewController
 	@FXML
 	private void initialize()
 	{
-		this.data.addAll(generateData());
+		List<Person> entities = personService.findAll();
+		this.data.addAll(entities);
 
 		// initialize person's table
 		firstNameColumn.setCellValueFactory(cell -> cell.getValue().firstNameProperty());
@@ -128,7 +136,11 @@ public class PersonOverviewController
 	{
 		int index = personTable.getSelectionModel().getSelectedIndex();
 		if (index >= 0)
-			return Optional.ofNullable(personTable.getItems().remove(index));
+		{
+			Person entity = personTable.getItems().remove(index);
+			personService.delete(entity.getId());
+			return Optional.ofNullable(entity);
+		}
 
 		Alert alert = new Alert(AlertType.WARNING);
 		alert.initOwner(mainApp.getPrimaryStage());
