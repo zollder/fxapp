@@ -1,4 +1,4 @@
-package org.app.model;
+package org.app.dto;
 
 import java.time.LocalDate;
 
@@ -10,6 +10,8 @@ import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+
+import org.app.model.Person;
 
 public class PersonDto
 {
@@ -26,18 +28,29 @@ public class PersonDto
 
 	public PersonDto(Person person)
 	{
-		this(person.getId(), person.getFirstName(), person.getLastName());
+		this(person.getId(),
+				person.getFirstName(),
+				person.getLastName(),
+				person.getStreet(),
+				person.getPostalCode(),
+				person.getCity(),
+				person.getBirthday());
 	}
 
 	public PersonDto(Long id, String fname, String lname)
 	{
+		this(id, fname, lname, "some street", 123321, "some city", LocalDate.of(1999, 2, 21));
+	}
+
+	public PersonDto(Long id, String fname, String lname, String street, Integer postalCode, String city, LocalDate date)
+	{
 		this.id = new SimpleLongProperty(id);
 		this.firstName = new SimpleStringProperty(fname);
 		this.lastName = new SimpleStringProperty(lname);;
-		this.street = new SimpleStringProperty("some street");
-		this.postalCode = new SimpleIntegerProperty(123321);
-		this.city = new SimpleStringProperty("some city");
-		this.birthday = new SimpleObjectProperty<LocalDate>(LocalDate.of(1999, 2, 21));
+		this.street = new SimpleStringProperty(street);
+		this.postalCode = new SimpleIntegerProperty(postalCode);
+		this.city = new SimpleStringProperty(city);
+		this.birthday = new SimpleObjectProperty<LocalDate>(date);
 	}
 
 	//--------------------------------------------------------------------------------------

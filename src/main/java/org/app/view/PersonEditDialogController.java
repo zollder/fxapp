@@ -11,7 +11,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import org.apache.commons.lang3.StringUtils;
-import org.app.model.PersonDto;
+import org.app.dto.PersonDto;
 import org.springframework.stereotype.Component;
 
 /**
@@ -150,10 +150,4 @@ public class PersonEditDialogController
 
 		return false;
 	}
-
-
-
-
-
-
 }

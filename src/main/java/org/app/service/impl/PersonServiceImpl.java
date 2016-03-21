@@ -1,5 +1,6 @@
 package org.app.service.impl;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,15 +31,15 @@ public class PersonServiceImpl implements PersonService
     @PostConstruct
     public void generateTestData() {
 		List<Person> data = Arrays.asList(
-				new Person("Hans", "Muster"),
-				new Person("Ruth", "Mueller"),
-				new Person("Heinz", "Kurz"),
-				new Person("Cornelia", "Meier"),
-				new Person("Werner", "Meyer"),
-				new Person("Lydia", "Kunz"),
-				new Person("Anna", "Best"),
-				new Person("Stefan", "Meier"),
-				new Person("Martin", "Mueller"));
+				new Person(null, "Hans", "Muster", "123 Street", 13579, "Berlin", LocalDate.of(1980, 5, 10)),
+				new Person(null, "Ruth", "Mueller", "236 Street", 10298, "Berlin", LocalDate.of(2000, 5, 10)),
+				new Person(null, "Heinz", "Kurz", "432 Street", 34256, "Berlin", LocalDate.of(1987, 5, 10)),
+				new Person(null, "Cornelia", "Meier", "654 Street", 19387, "Berlin", LocalDate.of(1978, 5, 10)),
+				new Person(null, "Werner", "Meyer", "378 Street", 98081, "Berlin", LocalDate.of(1998, 5, 10)),
+				new Person(null, "Lydia", "Kunz", "274 Street", 19902, "Berlin", LocalDate.of(1975, 5, 10)),
+				new Person(null, "Anna", "Best", "920 Street", 13579, "Berlin", LocalDate.of(1994, 5, 10)),
+				new Person(null, "Stefan", "Meier", "111 Street", 11223, "Berlin", LocalDate.of(2001, 5, 10)),
+				new Person(null, "Martin", "Mueller", "777 Street", 10009, "Berlin", LocalDate.of(2000, 5, 10)));
 
     	List<Person> savedEntities = personRepository.save(data);
     	logger.info("Saved IDs: " + savedEntities.stream().map(Person::getId).collect(Collectors.toList()).toString());

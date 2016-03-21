@@ -21,7 +21,7 @@ public class MainApp extends AbstractApplicationSupport
 {
 	@Autowired
 	@Qualifier("rootLayout")
-	private SpringApplicationConfig.View rootLayoutView;
+	private BorderPane rootLayout;
 
 	@Autowired
 	@Qualifier("personOverview")
@@ -35,8 +35,6 @@ public class MainApp extends AbstractApplicationSupport
 		context = SpringApplication.run(getClass(), getSavedArgs());
 		context.getAutowireCapableBeanFactory().autowireBean(this);
 
-		// load root layout and initialize its content
-		BorderPane rootLayout = (BorderPane) rootLayoutView.getView();
 		rootLayout.setCenter(personOverviewView.getView());
 		Scene scene = new Scene(rootLayout);
 

@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.layout.BorderPane;
 
 import org.app.view.PersonOverviewController;
 import org.springframework.context.annotation.Bean;
@@ -26,9 +27,9 @@ public class SpringApplicationConfig
 	 * @throws IOException
 	 */
 	@Bean(name = "rootLayout")
-	public View getRootLayout() throws IOException
+	public BorderPane getRootLayout() throws IOException
 	{
-		return loadView(PATH + ROOT);
+		return (BorderPane) loadView(PATH + ROOT).getView();
 	}
 
 	/**

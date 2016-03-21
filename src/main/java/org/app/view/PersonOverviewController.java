@@ -22,8 +22,8 @@ import javafx.stage.Stage;
 import javax.annotation.PostConstruct;
 
 import org.app.config.SpringApplicationConfig;
+import org.app.dto.PersonDto;
 import org.app.model.Person;
-import org.app.model.PersonDto;
 import org.app.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -211,7 +211,8 @@ public class PersonOverviewController
 		boolean okClicked = controller.isOkClicked();
 		if (okClicked)
 		{
-			Person savedPerson = personService.saveOrUpdate(new Person(person.getId(), person.getFirstName(), person.getLastName()));
+			Person savedPerson = personService.saveOrUpdate(new Person(person.getId(), person.getFirstName(), person.getLastName(),
+							person.getStreet(), person.getPostalCode(), person.getCity(), person.getBirthday()));
 			person.setId(savedPerson.getId());
 		}
 		return okClicked;
