@@ -11,9 +11,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import org.apache.commons.lang3.StringUtils;
-import org.app.model.Person;
-import org.app.service.PersonService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.app.model.PersonDto;
 import org.springframework.stereotype.Component;
 
 /**
@@ -30,13 +28,12 @@ public class PersonEditDialogController
 	@FXML private TextField postalCodeField;
 	@FXML private TextField birthDayField;
 
-	@Autowired
-	private PersonService personService;
-
 	private Stage dialogStage;
-	private Person person;
+	private PersonDto person;
 	private boolean okClicked;
 
+	/* The constructor is called before the initialize() method. */
+	public PersonEditDialogController() {}
 	/**
 	 * Initializes the controller class.
 	 * Is automatically called once FXML is loaded.
@@ -59,8 +56,8 @@ public class PersonEditDialogController
 			person.setPostalCode(Integer.parseInt(postalCodeField.getText()));
 			person.setCity(cityField.getText());
 			person.setBirthday(LocalDate.parse(birthDayField.getText(), DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+
 			okClicked = true;
-			person = personService.saveOrUpdate(person);
 			dialogStage.close();
 		}
 	}
@@ -88,7 +85,7 @@ public class PersonEditDialogController
 	 * Populates dialog fields with details of the person to edit.
 	 * @param person
 	 */
-	public void setPerson(Person person)
+	public void setPerson(PersonDto person)
 	{
 		this.person = person;
 		firstNameField.setText(person.getFirstName());
@@ -146,7 +143,6 @@ public class PersonEditDialogController
 			return true;
 
 		Alert alert = new Alert(AlertType.ERROR);
-		alert.initOwner(dialogStage);
 		alert.setTitle("Form field error(s)");
 		alert.setHeaderText("Invalid form field value(s).");
 		alert.setContentText(message.toString());

@@ -1,140 +1,59 @@
 package org.app.model;
 
-import java.time.LocalDate;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-
-import org.neo4j.ogm.annotation.GraphId;
-import org.neo4j.ogm.annotation.NodeEntity;
-
-@NodeEntity
+@Entity
+@Table
 public class Person
 {
-	@GraphId private Long id;
-	private StringProperty firstName;
-	private StringProperty lastName;
-	private StringProperty street;
-	private IntegerProperty postalCode;
-	private StringProperty city;
-	private ObjectProperty<LocalDate> birthday;
+	@Id
+	@GeneratedValue
+	private Long id;
 
-	//--------------------------------------------------------------------------------------
-	public Person() { this(null,null); }
+	@Column private String firstName;
+	@Column private String lastName;
 
-	public Person(String fname, String lname)
+	public Person() {}
+
+	public Person(String fName, String lName)
 	{
-		this.firstName = new SimpleStringProperty(fname);
-		this.lastName = new SimpleStringProperty(lname);;
-		this.street = new SimpleStringProperty("some street");
-		this.postalCode = new SimpleIntegerProperty(123321);
-		this.city = new SimpleStringProperty("some city");
-		this.birthday = new SimpleObjectProperty<LocalDate>(LocalDate.of(1999, 2, 21));
+		this.firstName = fName;
+		this.lastName = lName;
 	}
 
-	//--------------------------------------------------------------------------------------
+	public Person(Long id, String fName, String lName)
+	{
+		this.id = id;
+		this.firstName = fName;
+		this.lastName = lName;
+	}
+
 	public Long getId()
 	{
-		return this.id;
+		return id;
 	}
-
-	//--------------------------------------------------------------------------------------
-	public StringProperty firstNameProperty()
+	public void setId(Long id)
+	{
+		this.id = id;
+	}
+	public String getFirstName()
 	{
 		return firstName;
 	}
-
-	public void setFirstName(String fn)
+	public void setFirstName(String fname)
 	{
-		this.firstName.set(fn);
+		this.firstName = fname;
 	}
-
-	public String getFirstName()
-	{
-		return this.firstName.get();
-	}
-
-	//--------------------------------------------------------------------------------------
-	public StringProperty lastNameProperty()
+	public String getLastName()
 	{
 		return lastName;
 	}
-
-	public String getLastName()
+	public void setLastName(String lname)
 	{
-		return lastName.get();
-	}
-
-	public void setLastName(String ln)
-	{
-		this.lastName.set(ln);
-	}
-
-	//--------------------------------------------------------------------------------------
-	public void streetProperty(StringProperty street)
-	{
-		this.street = street;
-	}
-
-	public String getStreet()
-	{
-		return street.get();
-	}
-
-	public void setStreet(String street)
-	{
-		this.street.set(street);;
-	}
-
-	//--------------------------------------------------------------------------------------
-	public void postalCodeProperty(IntegerProperty postalCode)
-	{
-		this.postalCode = postalCode;
-	}
-
-	public Integer getPostalCode()
-	{
-		return postalCode.get();
-	}
-
-	public void setPostalCode(Integer pc)
-	{
-		this.postalCode.set(pc);
-	}
-
-	//--------------------------------------------------------------------------------------
-	public void cityProperty(StringProperty city)
-	{
-		this.city = city;
-	}
-
-	public String getCity()
-	{
-		return city.get();
-	}
-
-	public void setCity(String city)
-	{
-		this.city.set(city);
-	}
-
-	//--------------------------------------------------------------------------------------
-	public void birthdayProperty(ObjectProperty<LocalDate> birthday)
-	{
-		this.birthday = birthday;
-	}
-
-	public LocalDate getBirthday()
-	{
-		return birthday.get();
-	}
-
-	public void setBirthday(LocalDate bd)
-	{
-		this.birthday.set(bd);
+		this.lastName = lname;
 	}
 }

@@ -2,110 +2,54 @@ package org.app;
 
 import java.io.IOException;
 
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
-import org.app.view.PersonOverviewController;
+import org.app.config.SpringApplicationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Lazy;
 
+@Lazy
 @SpringBootApplication
-public class MainApp extends Application
+public class MainApp extends AbstractApplicationSupport
 {
-	private static String[] args;
-	private ApplicationContext context;
+	@Autowired
+	@Qualifier("rootLayout")
+	private SpringApplicationConfig.View rootLayoutView;
 
-	private Stage primaryStage;
-	private BorderPane rootLayout;
+	@Autowired
+	@Qualifier("personOverview")
+	private SpringApplicationConfig.View personOverviewView;
 
 	protected static final Logger logger = LoggerFactory.getLogger(MainApp.class);
 
 	@Override
 	public void start(Stage primaryStage) throws IOException
 	{
-		context = SpringApplication.run(MainApp.class, args);
-		this.primaryStage = primaryStage;
-		this.primaryStage.setTitle("AddressApp");
+		context = SpringApplication.run(getClass(), getSavedArgs());
+		context.getAutowireCapableBeanFactory().autowireBean(this);
 
-		initRootLayout();
-		showPersonOverview();
-	}
+		// load root layout and initialize its content
+		BorderPane rootLayout = (BorderPane) rootLayoutView.getView();
+		rootLayout.setCenter(personOverviewView.getView());
+		Scene scene = new Scene(rootLayout);
 
-	@Override
-	public void stop() throws Exception
-	{
-        try { super.stop(); }
-        catch (Exception ex)
-        { logger.error("Failed to close context. Message: " + ex.getLocalizedMessage()); }
-	}
-
-	/**
-	 * Initializes the root layout.
-	 */
-	public void initRootLayout()
-	{
-		try
-		{
-			// Load root layout from fxml file.
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("view/RootLayout.fxml"));
-			rootLayout = (BorderPane) loader.load();
-
-			// Show the scene containing the root layout.
-			Scene scene = new Scene(rootLayout);
-			primaryStage.setScene(scene);
-			primaryStage.show();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Shows the person overview inside the root layout.
-	 */
-	public void showPersonOverview()
-	{
-		try
-		{
-			// Load person overview.
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("view/PersonOverview.fxml"));
-			AnchorPane personOverview = (AnchorPane) loader.load();
-
-			// Set person overview into the center of root layout.
-			rootLayout.setCenter(personOverview);
-
-			// Give the controller access to the main app.
-			PersonOverviewController controller = loader.getController();
-			controller.setMainApp(this);
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Returns the main stage.
-	 * @return
-	 */
-	public Stage getPrimaryStage()
-	{
-		return primaryStage;
+		// configure primary stage
+		primaryStage.setTitle("AddressApp");
+		primaryStage.setScene(scene);
+		primaryStage.setResizable(true);
+		primaryStage.centerOnScreen();
+		primaryStage.show();
 	}
 
 	public static void main(String[] args)
 	{
-		MainApp.args= args;
-		launch(args);
+		launchApp(MainApp.class, args);
 	}
 }

@@ -1,37 +1,43 @@
 package org.app.view;
 
-import java.io.IOException;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import org.app.MainApp;
+import javax.annotation.PostConstruct;
+
+import org.app.config.SpringApplicationConfig;
 import org.app.model.Person;
+import org.app.model.PersonDto;
 import org.app.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+/**
+ * PersonOverviewController main layout controller implementation.
+ */
 @Component
 public class PersonOverviewController
 {
-	@FXML private TableView<Person> personTable;
-	@FXML private TableColumn<Person, String> firstNameColumn;
-	@FXML private TableColumn<Person, String> lastNameColumn;
+	@FXML private TableView<PersonDto> personTable;
+	@FXML private TableColumn<PersonDto, String> firstNameColumn;
+	@FXML private TableColumn<PersonDto, String> lastNameColumn;
 	@FXML private Label firstNameLabel;
 	@FXML private Label lastNameLabel;
 	@FXML private Label streetLabel;
@@ -42,37 +48,24 @@ public class PersonOverviewController
 	@Autowired
 	private PersonService personService;
 
-	private ObservableList<Person> data = FXCollections.observableArrayList();
+	@Autowired
+	@Qualifier("editDialog")
+	private SpringApplicationConfig.View editDialogView;
 
-	/* A hook to main */
-	private MainApp mainApp;
+	private ObservableList<PersonDto> data = FXCollections.observableArrayList();
+	private Scene dialogScene;
 
 	/* The constructor is called before the initialize() method. */
 	public PersonOverviewController() {}
 
 	/**
-	 * Is called by the main application to give a reference back to itself.
-	 * @param mainApp
-	 */
-	public void setMainApp(MainApp mainApp)
-	{
-		this.mainApp = mainApp;
-
-		// populate table with data
-		personTable.setItems(getData());
-	}
-
-	/**
-	 * Initializes the controller class. This method is automatically called
-     * after the FXML file has been loaded.
+	 * Initializes the controller class.
+	 * Is automatically called after the FXML file has been loaded.
 	 */
 	@FXML
 	private void initialize()
 	{
-		List<Person> entities = personService.findAll();
-		this.data.addAll(entities);
-
-		// initialize person's table
+		// sets value factory for cells to be displayed in the person table
 		firstNameColumn.setCellValueFactory(cell -> cell.getValue().firstNameProperty());
 		lastNameColumn.setCellValueFactory(cell -> cell.getValue().lastNameProperty());
 
@@ -84,16 +77,32 @@ public class PersonOverviewController
 	}
 
 	/**
+	 * Loads data from the database, converts it into appropriate format, and populated table with data.
+	 * Is called after all dependencies are injected.
+	 */
+	@PostConstruct
+	public void init()
+	{
+		// load entities from the DB and convert them into DTO
+		List<Person> entities = personService.findAll();
+		List<PersonDto> dtos = entities.stream().map(person -> new PersonDto(person)).collect(Collectors.toList());
+		this.data.addAll(dtos);
+
+		// populate table with data
+		personTable.setItems(getData());
+	}
+
+	/**
 	 * Handles new operation.
 	 * Is called when a user clicks "new..." button.
 	 * Opens a dialog to enter new person details.
-	 * Returns created {@link Person} object.
+	 * Returns created {@link PersonDto} object.
 	 */
 	@FXML
-	private Optional<Person> handleCreatePerson()
+	private Optional<PersonDto> handleCreatePerson()
 	{
-		Person newPerson = new Person();
-		if (showPersonEditDialog(newPerson, mainApp.getPrimaryStage()))
+		PersonDto newPerson = new PersonDto();
+		if (showPersonEditDialog(newPerson))
 			getData().add(newPerson);
 
 		return Optional.ofNullable(newPerson);
@@ -103,47 +112,41 @@ public class PersonOverviewController
 	 * Handles edit operation.
 	 * Is called when a user clicks "edit..." button.
 	 * Opens a dialog to modify existing person details.
-	 * Returns modified {@link Person} object.
+	 * Returns modified {@link PersonDto} object.
 	 */
 	@FXML
-	private Optional<Person> handleEditPerson()
+	private Optional<PersonDto> handleEditPerson()
 	{
-		Person selectedPerson = personTable.getSelectionModel().getSelectedItem();
+		PersonDto selectedPerson = personTable.getSelectionModel().getSelectedItem();
 		if (selectedPerson != null)
 		{
-			if (showPersonEditDialog(selectedPerson, mainApp.getPrimaryStage()))
+			if (showPersonEditDialog(selectedPerson))
 				showPersonDetails(selectedPerson);
-			else
-			{
-				Alert alert = new Alert(AlertType.WARNING);
-				alert.initOwner(mainApp.getPrimaryStage());
-				alert.setTitle("Edit error");
-				alert.setHeaderText("No Person selected");
-				alert.setContentText("Please select a person to edit.");
-				alert.showAndWait();
-			}
 		}
-
+		else
+		{
+			Alert alert = new Alert(AlertType.WARNING);
+			alert.setTitle("Edit error");
+			alert.setHeaderText("No Person selected");
+			alert.setContentText("Please select a person to edit.");
+			alert.showAndWait();
+		}
 		return Optional.ofNullable(selectedPerson);
 	}
 
 	/**
 	 * Handles delete operation.
-	 * Returns deleted {@link Person} object.
+	 * Returns deleted {@link PersonDto} object.
 	 */
 	@FXML
-	private Optional<Person> handleDeletePerson()
+	private Optional<PersonDto> handleDeletePerson()
 	{
-		int index = personTable.getSelectionModel().getSelectedIndex();
-		if (index >= 0)
-		{
-			Person entity = personTable.getItems().remove(index);
-			personService.delete(entity.getId());
-			return Optional.ofNullable(entity);
+		TableViewSelectionModel<PersonDto> item = personTable.getSelectionModel();
+		if ((item != null) && personService.delete(item.getSelectedItem().getId())) {
+			return Optional.ofNullable(personTable.getItems().remove(item.getSelectedIndex()));
 		}
 
 		Alert alert = new Alert(AlertType.WARNING);
-		alert.initOwner(mainApp.getPrimaryStage());
 		alert.setTitle("Delete error");
 		alert.setHeaderText("No Person selected");
 		alert.setContentText("Please select a person to delete.");
@@ -152,11 +155,11 @@ public class PersonOverviewController
 	}
 
 	/**
-	 * Populates person details fields {@link Person} info.
+	 * Populates person details fields {@link PersonDto} info.
 	 * Clears person details fields if the person is null.
 	 * @param person
 	 */
-	private void showPersonDetails(Person person)
+	private void showPersonDetails(PersonDto person)
 	{
 		if (person != null)
 		{
@@ -182,53 +185,44 @@ public class PersonOverviewController
 	 * Opens a dialog to edit details of the specified person.
 	 * @param peson
 	 */
-	public boolean showPersonEditDialog(Person person, Stage primaryStage)
+	public boolean showPersonEditDialog(PersonDto person)
 	{
-		try
+		// load FXML and create new dialog stage
+		Stage dialogStage = new Stage();
+		dialogStage.setTitle("Edit Person");
+		dialogStage.initModality(Modality.WINDOW_MODAL);
+
+		AnchorPane editDialog = (AnchorPane) editDialogView.getView();
+		if (dialogScene == null)
+			dialogScene = new Scene(editDialog);
+		else
+			dialogScene.setRoot(editDialog);
+
+		dialogStage.setScene(dialogScene);
+
+		// get dialog controller and set Person object
+		PersonEditDialogController controller = (PersonEditDialogController) editDialogView.getController();
+		controller.setDialogStage(dialogStage);
+		controller.setPerson(person);
+
+		dialogStage.showAndWait();
+
+		// save/update a Person if ok button was clicked
+		boolean okClicked = controller.isOkClicked();
+		if (okClicked)
 		{
-			// load FXML and create new dialog stage
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("view/PersonEditDialog.fxml"));
-			AnchorPane editDialog = (AnchorPane) loader.load();
-
-			Stage dialogStage = new Stage();
-			dialogStage.setTitle("Edit Person");
-			dialogStage.initModality(Modality.WINDOW_MODAL);
-			dialogStage.initOwner(primaryStage);
-			Scene dialogScene = new Scene(editDialog);
-			dialogStage.setScene(dialogScene);
-
-			// get dialog controller and set Person object
-			PersonEditDialogController controller = loader.getController();
-			controller.setDialogStage(dialogStage);
-			controller.setPerson(person);
-
-			dialogStage.showAndWait();
-			return controller.isOkClicked();
+			Person savedPerson = personService.saveOrUpdate(new Person(person.getId(), person.getFirstName(), person.getLastName()));
+			person.setId(savedPerson.getId());
 		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-			return false;
-		}
+		return okClicked;
 	}
 
-	public ObservableList<Person> getData()
+	/**
+	 * Returns an observable list of {@link PersonDto}s.
+	 * @param peson
+	 */
+	public ObservableList<PersonDto> getData()
 	{
 		return data;
-	}
-
-	public List<Person> generateData()
-	{
-		return Arrays.asList(
-				new Person("Hans", "Muster"),
-				new Person("Ruth", "Mueller"),
-				new Person("Heinz", "Kurz"),
-				new Person("Cornelia", "Meier"),
-				new Person("Werner", "Meyer"),
-				new Person("Lydia", "Kunz"),
-				new Person("Anna", "Best"),
-				new Person("Stefan", "Meier"),
-				new Person("Martin", "Mueller"));
 	}
 }

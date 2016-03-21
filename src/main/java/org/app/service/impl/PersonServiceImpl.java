@@ -1,5 +1,6 @@
 package org.app.service.impl;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -15,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service("PersonService")
+@Service("personService")
 public class PersonServiceImpl implements PersonService
 {
 	protected static final Logger logger = LoggerFactory.getLogger(PersonServiceImpl.class);
@@ -28,7 +29,19 @@ public class PersonServiceImpl implements PersonService
 	 */
     @PostConstruct
     public void generateTestData() {
-    	// TODO: add some data here
+		List<Person> data = Arrays.asList(
+				new Person("Hans", "Muster"),
+				new Person("Ruth", "Mueller"),
+				new Person("Heinz", "Kurz"),
+				new Person("Cornelia", "Meier"),
+				new Person("Werner", "Meyer"),
+				new Person("Lydia", "Kunz"),
+				new Person("Anna", "Best"),
+				new Person("Stefan", "Meier"),
+				new Person("Martin", "Mueller"));
+
+    	List<Person> savedEntities = personRepository.save(data);
+    	logger.info("Saved IDs: " + savedEntities.stream().map(Person::getId).collect(Collectors.toList()).toString());
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -45,19 +58,22 @@ public class PersonServiceImpl implements PersonService
 	@Transactional
 	public Person saveOrUpdate(Person person)
 	{
+    	logger.info(String.format("Saving person with ID: %s", String.valueOf(person.getId())));
     	Person savedEntity = personRepository.save(person);
-    	logger.error(String.format("Saved/updated a person. Person id: %s.", String.valueOf(savedEntity.getId())));
+    	logger.info(String.format("Saved/updated a person. Person id: %s.", String.valueOf(savedEntity.getId())));
     	return savedEntity;
 	}
 
     // ---------------------------------------------------------------------------------------------
 	@Override
 	@Transactional
-	public void delete(Long id)
+	public boolean delete(Long id)
 	{
-		if ((id != null) && !personRepository.exists(id))
+		if ((id != null) && personRepository.exists(id)) {
 			personRepository.delete(id);
-		else
-			logger.error(String.format("A person with id %s doesn't exist.", String.valueOf(id)));
+			return true;
+		}
+		logger.error(String.format("A person with id %s doesn't exist.", String.valueOf(id)));
+		return false;
 	}
 }
