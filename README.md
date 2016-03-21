@@ -9,3 +9,6 @@ Dev stack summary:
 * Spring Data JPA
 * JavaFX 8
 * DB2
+
+Prerequisites: JRE 8, gradle
+Run with: gradle run
