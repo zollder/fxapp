@@ -2,11 +2,9 @@ package org.app;
 
 import java.io.IOException;
 
-import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
-import org.app.config.SpringApplicationConfig;
+import org.app.view.RootLayoutController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +18,8 @@ import org.springframework.context.annotation.Lazy;
 public class MainApp extends AbstractApplicationSupport
 {
 	@Autowired
-	@Qualifier("rootLayout")
-	private BorderPane rootLayout;
-
-	@Autowired
-	@Qualifier("personOverview")
-	private SpringApplicationConfig.View personOverviewView;
+	@Qualifier("rootLayoutController")
+	private RootLayoutController rootLayoutController;
 
 	protected static final Logger logger = LoggerFactory.getLogger(MainApp.class);
 
@@ -35,15 +29,7 @@ public class MainApp extends AbstractApplicationSupport
 		context = SpringApplication.run(getClass(), getSavedArgs());
 		context.getAutowireCapableBeanFactory().autowireBean(this);
 
-		rootLayout.setCenter(personOverviewView.getView());
-		Scene scene = new Scene(rootLayout);
-
-		// configure primary stage
-		primaryStage.setTitle("AddressApp");
-		primaryStage.setScene(scene);
-		primaryStage.setResizable(true);
-		primaryStage.centerOnScreen();
-		primaryStage.show();
+		rootLayoutController.showRootLayout(primaryStage);
 	}
 
 	public static void main(String[] args)

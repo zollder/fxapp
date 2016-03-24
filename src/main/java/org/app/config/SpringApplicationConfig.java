@@ -7,6 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.layout.BorderPane;
 
 import org.app.view.PersonOverviewController;
+import org.app.view.RootLayoutController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -22,14 +23,23 @@ public class SpringApplicationConfig
 	private static final String EDIT_DIALOG = "PersonEditDialog.fxml";
 
 	/**
-	 * Wraps root layout into {@link View}.
-	 * @return View - root layout {@link View}
+	 * Loads and returns root layout view.
 	 * @throws IOException
 	 */
-	@Bean(name = "rootLayout")
-	public BorderPane getRootLayout() throws IOException
+	@Bean(name = "rootLayoutView")
+	public BorderPane getRootLayoutView() throws IOException
 	{
 		return (BorderPane) loadView(PATH + ROOT).getView();
+	}
+
+	/**
+	 * Loads and returns root layout controller.
+	 * @throws IOException
+	 */
+	@Bean(name = "rootLayoutController")
+	public RootLayoutController getRootLayoutController() throws IOException
+	{
+		return (RootLayoutController) loadView(PATH + ROOT).getController();
 	}
 
 	/**
